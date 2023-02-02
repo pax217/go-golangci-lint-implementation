@@ -1,0 +1,82 @@
+// Example 1: el argumento fmt no es de tipo decimal & la variable debe usar camel case
+package main
+
+import "fmt"
+
+func main() {
+	const print_str = "Gopher"
+	fmt.Printf("Hello, %d\n", print_str)
+}
+
+-->
+main.go:7:2: printf: fmt.Printf format %d has arg print_str of wrong type string, see also https://pkg.go.dev/fmt#hdr-Printing (govet)
+        fmt.Printf("Hello, %d\n", print_str)
+        ^
+main.go:6:8: ST1003: should not use underscores in Go names; const print_str should be printStr (stylecheck)
+        const print_str = "Gopher"
+              ^
+
+// Example 2: Falta el segundo argumento en la linea de texto
+package main
+
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+func main() {
+	const prefixHttp = "http://"
+
+	var methods [2]string
+	methods[0] = "http://method-0"
+	methods[1] = "no-prefix-method-1"
+
+	for _, method := range methods {
+		if !strings.HasPrefix(method, prefixHttp) {
+			fmt.Fprintf(os.Stderr, "el metodo %s no contienes el prefijo %q\n", method)
+			continue
+		}
+	}
+}
+-->
+    main.go:18:4: printf: fmt.Fprintf format %q reads arg #2, but call has 1 arg (govet)
+                            fmt.Fprintf(os.Stderr, "el metodo %s no contienes el prefijo %q\n", method)
+                            ^
+    main.go:10:8: ST1003: const prefixHttp should be prefixHTTP (stylecheck)
+            const prefixHttp = "http://"
+                  ^
+
+//Example 3 : Variables y métodos sin uso
+package main
+
+import "fmt"
+
+func main() {
+
+	const number = 3
+
+	println("Calculate square number")
+
+	var square = squareNum(true, number)
+
+	println(fmt.Sprintf("the square of %d result is %d", number, square))
+
+	unusedFunction("test")
+}
+
+func squareNum(fast bool, num int) int {
+	return num * num
+}
+
+func unusedFunction(message string) {
+	println(fmt.Printf("message: %s", message))
+}
+
+-->
+
+    main.go:18:16: `squareNum` - `fast` is unused (unparam)
+    func squareNum(fast bool, num int) int {
+                   ^
+    main.go:5: unnecessary leading newline (whitespace)
+    func main() {
